@@ -1,0 +1,51 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# docker-compose.yml — LLM Performance Benchmarking CLI Tool
+# ─────────────────────────────────────────────────────────────────────────────
+# Usage:
+#   docker-compose up --build          # build image and run benchmark
+#   docker-compose run llm-bench \
+#     python src/cli.py --config config/benchmark_config.yaml \
+#     --num-prompts 3                  # run with custom flags
+# ─────────────────────────────────────────────────────────────────────────────
+version: "3.9"
+
+services:
+  llm-bench:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: llm-bench:latest
+    container_name: llm_benchmarking
+
+    # ── Load environment variables from .env ──────────────────────────────────
+    env_file:
+      - .env
+
+    # ── Volume mounts ─────────────────────────────────────────────────────────
+    volumes:
+      # Persist benchmark results (CSV + charts) on the host
+      - ./output:/app/output
+
+      # Persist downloaded HF model weights across container restarts
+      - hf_model_cache:/app/.cache/huggingface
+
+      # Mount local config/data so you can change them without rebuilding
+      - ./config:/app/config:ro
+      - ./data:/app/data:ro
+
+    # ── Resource limits (adjust for your machine) ─────────────────────────────
+    # Uncomment to limit RAM usage:
+    # mem_limit: 4g
+    # memswap_limit: 4g
+
+    # ── stdin / tty for tqdm progress bars ───────────────────────────────────
+    stdin_open: true
+    tty: true
+
+    # ── Default command (overridable at runtime) ──────────────────────────────
+    command: ["python", "src/cli.py", "--config", "config/benchmark_config.yaml"]
+
+# ── Named volumes ─────────────────────────────────────────────────────────────
+volumes:
+  hf_model_cache:
+    driver: local

@@ -1,0 +1,28 @@
+# LLM Benchmark Configuration
+# ----------------------------
+# Edit this file to change models, prompts, or output settings.
+# Supports YAML (.yaml/.yml) and JSON (.json) formats.
+
+# ── Models ────────────────────────────────────────────────────────────────────
+# At least 3 Hugging Face model identifiers are required.
+# These are small, CPU-friendly models ideal for benchmarking without a GPU.
+models:
+  - "sshleifer/tiny-gpt2"   # ~30 MB  — ultra-fast, great for CI smoke tests
+  - "distilgpt2"             # ~350 MB — distilled GPT-2, 2× faster than gpt2
+  - "gpt2"                   # ~500 MB — original GPT-2 small (124 M params)
+
+# ── Dataset ───────────────────────────────────────────────────────────────────
+# Path (relative to the project root, or absolute) to the prompts text file.
+# One prompt per line; blank lines are ignored.
+dataset_path: "data/prompts.txt"
+
+# ── Output ────────────────────────────────────────────────────────────────────
+# Directory where the CSV results and chart PNGs will be saved.
+output_dir: "output"
+
+# ── Inference settings ────────────────────────────────────────────────────────
+# Maximum number of new tokens to generate per prompt.
+max_new_tokens: 80
+
+# Limit the number of prompts from the dataset (null = use all prompts).
+num_prompts: null
